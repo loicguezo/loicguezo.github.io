@@ -10,7 +10,8 @@
     <meta property="og:description" content="">
 </head>
 <body>
-    <img id="avatar" alt="user avatar" style="width: 25vw;">
+
+	<img id="avatar" alt="user avatar" style="width: 25vw;">
     <div id="briefing"></div>
     <div id="project"></div>
     <script>
@@ -20,6 +21,7 @@
         const briefing = document.getElementById("briefing");
         const project = document.getElementById("project");
 
+	// fetching github showcase repository
         fetch(`https://api.github.com/repos/${USERNAME}/${USERNAME}/readme`, {
             headers: { "Accept": "application/vnd.github.html+json" }
         })
@@ -30,6 +32,25 @@
             .catch(err => {
                 project.innerHTML = `error: ${err}`;
             });
+
+	// fetching the most popular github repositories
+	fetch(`https://api.github.com/users/${USERNAME}/repos?per_page=100`, {
+		headers: { "Accept": "application/json" }
+	})
+		.then(res => res.json())
+		.then(repos => {
+			repos.forEach(repo => {
+				const pCard=document.createElement("div");
+				pCard.innerHTML=`<h3>
+					<a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">${repo.name}</a></h3>
+                        		<p>${repo.description ? repo.description : "No description"}</p>
+                        		<div class="repo-meta">
+					    stars: ${repo.stargazers_count} &nbsp;|&nbsp;
+					    ${repo.language ? repo.language : "—"}
+					</div>`;
+				project.appendChild(pCard);
+			})
+		});
     </script>
 </body>
 </html>
